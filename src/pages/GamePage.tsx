@@ -1,83 +1,102 @@
-import { useState } from "react";
-import { texts } from "../data/texts";
+import { useCallback, useMemo, useState } from "react";
+import { Link } from "react-router";
+import useTextSets from "../hooks/useTextSets";
 import {
-    getCurrentWordIndex,
     hasTypingError,
     isBlockedSpace,
-    isLastText,
-    isTextComplete,
+    isLastIndex,
+    isWordDone,
     splitWords,
 } from "../utils/typing";
 import { calculateWpm, countWords } from "../utils/wpm";
-import {
-    clearLeaderboard,
-    getLeaderboard,
-    saveScore,
-} from "../utils/leaderboard";
+import useLeaderboard from "../hooks/useLeaderboard";
 import useStopwatch from "../hooks/useStopwatch";
 import TextDisplay from "../components/TextDisplay";
 import TypingInput from "../components/TypingInput";
 import Stopwatch from "../components/Stopwatch";
 import Result from "../components/Result";
 import Leaderboard from "../components/Leaderboard";
-
-const totalWords = countWords(texts);
+import SetPicker from "../components/SetPicker";
 
 export default function GamePage() {
+    const { sets } = useTextSets();
+    const [selectedSetId, setSelectedSetId] = useState(sets[0].id);
+    const selectedSet = sets.find((set) => set.id === selectedSetId) ?? sets[0];
+    const texts = selectedSet.texts;
+    const totalWords = useMemo(() => countWords(texts), [texts]);
+
     const [input, setInput] = useState("");
     const [textIndex, setTextIndex] = useState(0);
+    const [wordIndex, setWordIndex] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
-    const [leaderboard, setLeaderboard] = useState(getLeaderboard);
+    const [finalSeconds, setFinalSeconds] = useState(0);
+    const { scores, addScore, clearScores } = useLeaderboard();
     const {
-        seconds,
         isRunning,
         isPaused,
         start,
         pause,
         stop,
         reset: resetStopwatch,
+        getSeconds,
     } = useStopwatch();
-    const text = texts[textIndex];
-    const words = splitWords(text);
-    const currentIndex = getCurrentWordIndex(input);
-    const hasError = hasTypingError(text, input);
+
+    const text = texts[textIndex] ?? "";
+    const words = useMemo(() => splitWords(text), [text]);
+    const currentWord = words[wordIndex];
+    const hasError = hasTypingError(currentWord, input);
 
     const finishGame = () => {
-        const finalSeconds = stop();
-        const updated = saveScore({
-            wpm: calculateWpm(totalWords, finalSeconds),
-            seconds: finalSeconds,
+        const seconds = stop();
+        addScore({
+            wpm: calculateWpm(totalWords, seconds),
+            seconds,
             date: new Date().toISOString(),
         });
-        setLeaderboard(updated);
+        setFinalSeconds(seconds);
         setIsFinished(true);
     };
 
-    const startNewGame = () => {
+    const startNewGame = useCallback(() => {
         setInput("");
         setTextIndex(0);
+        setWordIndex(0);
         setIsFinished(false);
         resetStopwatch();
-    };
+    }, [resetStopwatch]);
 
-    const resetLeaderboard = () => {
+    const selectSet = useCallback((id: string) => {
+        setSelectedSetId(id);
+        startNewGame();
+    }, [startNewGame]);
+
+    const resetLeaderboard = useCallback(() => {
         if (!window.confirm("למחוק את כל השיאים?")) return;
-        setLeaderboard(clearLeaderboard());
-    };
+        clearScores();
+    }, [clearScores]);
 
     const handleInputChange = (value: string) => {
         if (isFinished || isPaused) return;
-        if (isBlockedSpace(text, value)) return;
+        if (isBlockedSpace(currentWord, value)) return;
         if (!isRunning) start();
 
-        if (!isTextComplete(text, value)) {
+        const isLastWord = isLastIndex(wordIndex, words.length);
+
+        if (!isWordDone(currentWord, value, isLastWord)) {
             setInput(value);
             return;
         }
 
         setInput("");
 
-        if (isLastText(textIndex, texts.length)) {
+        if (!isLastWord) {
+            setWordIndex(wordIndex + 1);
+            return;
+        }
+
+        setWordIndex(0);
+
+        if (isLastIndex(textIndex, texts.length)) {
             finishGame();
             return;
         }
@@ -87,20 +106,32 @@ export default function GamePage() {
 
     const leaderboardSection = (
         <Leaderboard
-            scores={leaderboard}
+            scores={scores}
             onNewGame={startNewGame}
             onReset={resetLeaderboard}
         />
     );
+
+    if (texts.length === 0) {
+        return (
+            <div className="game-page">
+                <h1 className="game-title">TypeRacer</h1>
+                <SetPicker sets={sets} selectedId={selectedSetId} onSelect={selectSet} />
+                <p className="text-progress">אין משפטים בסט הזה</p>
+                <Link className="page-link" to="/sets">עריכת סטים</Link>
+                {leaderboardSection}
+            </div>
+        );
+    }
 
     if (isFinished) {
         return (
             <div className="game-page">
                 <h1 className="game-title">TypeRacer</h1>
                 <Result
-                    seconds={seconds}
+                    seconds={finalSeconds}
                     totalWords={totalWords}
-                    wpm={calculateWpm(totalWords, seconds)}
+                    wpm={calculateWpm(totalWords, finalSeconds)}
                 />
                 {leaderboardSection}
             </div>
@@ -110,21 +141,24 @@ export default function GamePage() {
     return (
         <div className="game-page">
             <h1 className="game-title">TypeRacer</h1>
+            <SetPicker sets={sets} selectedId={selectedSetId} onSelect={selectSet} />
+            <Link className="page-link" to="/sets">עריכת סטים</Link>
             <Stopwatch
-                seconds={seconds}
                 isRunning={isRunning}
                 isPaused={isPaused}
+                getSeconds={getSeconds}
                 onPause={pause}
                 onResume={start}
             />
             <p className="text-progress">
-                משפט {textIndex + 1} מתוך {texts.length}
+                משפט {textIndex + 1} מתוך {texts.length} · מילה {wordIndex + 1} מתוך {words.length}
             </p>
             <TextDisplay
                 words={words}
-                currentIndex={currentIndex}
+                currentIndex={wordIndex}
+                input={input}
                 isHidden={isPaused}
-            />{" "}
+            />
             <TypingInput
                 value={input}
                 onChange={handleInputChange}

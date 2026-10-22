@@ -3,3 +3,10 @@ export type Score = {
   seconds: number;
   date: string;
 };
+
+
+export type TextSet = {
+  id: string;
+  title: string;
+  texts: string[];
+};

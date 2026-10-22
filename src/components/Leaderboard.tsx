@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Score } from "../types";
 
 type LeaderboardProps = {
@@ -10,13 +11,13 @@ function formatDate(isoDate: string) {
   return new Date(isoDate).toLocaleDateString("he-IL");
 }
 
-export default function Leaderboard({ scores, onNewGame, onReset }: LeaderboardProps) {
+function Leaderboard({ scores, onNewGame, onReset }: LeaderboardProps) {
   return (
     <div className="leaderboard">
       <h2 className="leaderboard-title">טבלת השיאים</h2>
 
       {scores.length === 0 ? (
-        <p className="leaderboard-empty">עוד אין שיאים. תהיה הראשון!</p>
+        <p className="leaderboard-empty"> אין עוד שיאים!. תהיה הראשון</p>
       ) : (
         <table className="leaderboard-table">
           <thead>
@@ -51,3 +52,5 @@ export default function Leaderboard({ scores, onNewGame, onReset }: LeaderboardP
     </div>
   );
 }
+
+export default memo(Leaderboard)

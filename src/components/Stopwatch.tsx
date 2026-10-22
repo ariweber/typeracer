@@ -1,18 +1,35 @@
+import { useEffect, useState } from "react";
+
 type StopwatchProps = {
-  seconds: number;
   isRunning: boolean;
   isPaused: boolean;
   onPause: () => void;
   onResume: () => void;
+  getSeconds: () => number;
 };
 
-export default function Stopwatch({ seconds, isRunning, isPaused, onPause, onResume }: StopwatchProps) {
+export default function Stopwatch(
+  { isRunning, isPaused, onPause, onResume, getSeconds }: StopwatchProps,
+) {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    setSeconds(getSeconds());
+    if (!isRunning) return;
+    const intervalId = setInterval(() => {
+      setSeconds(getSeconds());
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [isRunning, isPaused, getSeconds]);
+
   return (
     <div className="stopwatch-wrapper">
-      <p className={isPaused ? "stopwatch paused" : "stopwatch"}>זמן: {seconds} שניות</p>
+      <p className={isPaused ? "stopwatch paused" : "stopwatch"}>
+        זמן: {seconds} שניות
+      </p>
       {isRunning && (
         <button className="button button-secondary" onClick={onPause}>
-         עצירה
+          עצירה
         </button>
       )}
       {isPaused && (

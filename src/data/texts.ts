@@ -1,5 +1,7 @@
+import type { TextSet } from "../types";
+
 const hebrewTexts = [
-  "מעט מן האור דוחה הרבה מן החושך",
+  "מעט אור דוחה הרבה חושך",
   "צריך לחיות עם הזמן וללמוד בכל יום את פרשת השבוע",
   "תחשוב טוב יהיה טוב",
   "המעשה הוא העיקר",
@@ -27,5 +29,10 @@ const codeTexts = [
   "const total = items.reduce((sum, item) => sum + item.price, 0);",
 ];
 
-export const texts = codeTexts;
+
+export const defaultSets: TextSet[] = [
+  { id: "hebrew", title: "עברית", texts: hebrewTexts },
+  { id: "english", title: "English", texts: englishTexts },
+  { id: "code", title: "קוד", texts: codeTexts },
+];
 

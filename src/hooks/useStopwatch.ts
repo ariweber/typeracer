@@ -1,54 +1,60 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 function toSeconds(ms: number) {
   return Math.floor(ms / 1000);
 }
 
 export default function useStopwatch() {
-  const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const startTimeRef = useRef(0);
   const accumulatedRef = useRef(0);
+  const isRunningRef = useRef(false);
 
-  const getTotalMs = () => accumulatedRef.current + (Date.now() - startTimeRef.current);
+  const getElapsedMs = useCallback(() => {
+    if (!isRunningRef.current) return accumulatedRef.current;
+    return accumulatedRef.current + (Date.now() - startTimeRef.current);
+  }, []);
 
-  useEffect(() => {
-    if (!isRunning) return;
-
-    const intervalId = setInterval(() => {
-      setSeconds(toSeconds(getTotalMs()));
-    }, 200);
-
-    return () => clearInterval(intervalId);
-  }, [isRunning]);
+  const getSeconds = useCallback(() => toSeconds(getElapsedMs()), [
+    getElapsedMs,
+  ]);
 
   const start = () => {
     startTimeRef.current = Date.now();
+    isRunningRef.current = true;
     setIsRunning(true);
     setIsPaused(false);
   };
 
   const pause = () => {
-    accumulatedRef.current = getTotalMs();
-    setSeconds(toSeconds(accumulatedRef.current));
+    accumulatedRef.current = getElapsedMs();
+    isRunningRef.current = false;
     setIsRunning(false);
     setIsPaused(true);
   };
 
   const stop = () => {
-    const finalSeconds = toSeconds(isRunning ? getTotalMs() : accumulatedRef.current);
-    setSeconds(finalSeconds);
+    accumulatedRef.current = getElapsedMs();
+    isRunningRef.current = false;
     setIsRunning(false);
-    return finalSeconds;
+    return toSeconds(accumulatedRef.current);
   };
 
-  const reset = () => {
+  const reset = useCallback(() => {
     accumulatedRef.current = 0;
-    setSeconds(0);
+    isRunningRef.current = false;
     setIsRunning(false);
     setIsPaused(false);
-  };
+  }, []);
 
-  return { seconds, isRunning, isPaused, start, pause, stop, reset };
+  return {
+    isRunning,
+    isPaused,
+    start,
+    pause,
+    stop,
+    reset,
+    getSeconds
+  };
 }
