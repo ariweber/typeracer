@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 import { Link } from "react-router";
-import useTextSets from "../hooks/useTextSets";
+import { observer } from "mobx-react-lite";
+import { setsStore } from "../stores/setsStore";
 import AddTextForm from "../components/AddTextForm";
 import SetPicker from "../components/SetPicker";
 
-export default function SetsPage() {
-    const { sets, addText, addSet, removeText, removeSet } = useTextSets();
+function SetsPage() {
+    const { sets, addText, addSet, removeText, removeSet } = setsStore;
     const [selectedSetId, setSelectedSetId] = useState(sets[0].id);
     const selectedSet = sets.find((set) => set.id === selectedSetId) ?? sets[0];
 
@@ -78,3 +79,6 @@ export default function SetsPage() {
         </div>
     );
 }
+
+
+export default observer(SetsPage);

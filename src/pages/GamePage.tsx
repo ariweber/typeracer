@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { Link } from "react-router";
-import useTextSets from "../hooks/useTextSets";
+import { observer } from "mobx-react-lite";
+import { setsStore } from "../stores/setsStore";
+import { leaderboardStore } from "../stores/leaderboardStore";
 import {
     hasTypingError,
     isBlockedSpace,
@@ -9,7 +11,6 @@ import {
     splitWords,
 } from "../utils/typing";
 import { calculateWpm, countWords } from "../utils/wpm";
-import useLeaderboard from "../hooks/useLeaderboard";
 import useStopwatch from "../hooks/useStopwatch";
 import TextDisplay from "../components/TextDisplay";
 import TypingInput from "../components/TypingInput";
@@ -18,8 +19,9 @@ import Result from "../components/Result";
 import Leaderboard from "../components/Leaderboard";
 import SetPicker from "../components/SetPicker";
 
-export default function GamePage() {
-    const { sets } = useTextSets();
+function GamePage() {
+    console.log(leaderboardStore.scores);
+    const { sets } = setsStore;
     const [selectedSetId, setSelectedSetId] = useState(sets[0].id);
     const selectedSet = sets.find((set) => set.id === selectedSetId) ?? sets[0];
     const texts = selectedSet.texts;
@@ -30,7 +32,7 @@ export default function GamePage() {
     const [wordIndex, setWordIndex] = useState(0);
     const [isFinished, setIsFinished] = useState(false);
     const [finalSeconds, setFinalSeconds] = useState(0);
-    const { scores, addScore, clearScores } = useLeaderboard();
+    const { scores, addScore, clearScores } = leaderboardStore;
     const {
         isRunning,
         isPaused,
@@ -42,7 +44,7 @@ export default function GamePage() {
     } = useStopwatch();
 
     const text = texts[textIndex] ?? "";
-    const words = useMemo(() => splitWords(text), [text]);
+    const words = splitWords(text)
     const currentWord = words[wordIndex];
     const hasError = hasTypingError(currentWord, input);
 
@@ -169,3 +171,6 @@ export default function GamePage() {
         </div>
     );
 }
+
+
+export default observer(GamePage);

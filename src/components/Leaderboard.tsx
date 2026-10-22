@@ -1,5 +1,5 @@
-import { memo } from "react";
 import type { Score } from "../types";
+import { observer } from "mobx-react-lite/src/observer.js";
 
 type LeaderboardProps = {
   scores: Score[];
@@ -53,4 +53,4 @@ function Leaderboard({ scores, onNewGame, onReset }: LeaderboardProps) {
   );
 }
 
-export default memo(Leaderboard)
+export default observer(Leaderboard)

@@ -247,6 +247,11 @@ body {
   border-bottom: 1px dotted silver;
 }
 
+.leaderboard-table th:not(:last-child),
+.leaderboard-table td:not(:last-child) {
+  padding-inline-end: 1rem;
+}
+
 .leaderboard-table tbody tr:first-child {
   font-weight: 700;
 }
