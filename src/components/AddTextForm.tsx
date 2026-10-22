@@ -2,11 +2,11 @@ import { memo, useState } from "react";
 
 type AddTextFormProps = {
   onAdd: (text: string) => void;
-  placeholder?: string;
-  buttonLabel?: string;
+  placeholder: string;
+  buttonLabel: string;
 };
 
-function AddTextForm({ onAdd, placeholder = "משפט חדש", buttonLabel = "הוסף" }: AddTextFormProps) {
+function AddTextForm({ onAdd, placeholder, buttonLabel }: AddTextFormProps) {
   const [draft, setDraft] = useState("");
 
   return (

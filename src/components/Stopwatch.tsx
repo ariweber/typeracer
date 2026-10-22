@@ -28,7 +28,7 @@ export default function Stopwatch(
         זמן: {seconds} שניות
       </p>
       {isRunning && (
-        <button className="button button-secondary" onClick={onPause}>
+        <button className="button" onClick={onPause}>
           עצירה
         </button>
       )}
