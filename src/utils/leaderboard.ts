@@ -1,7 +1,7 @@
 import type { Score } from "../types";
 
 const STORAGE_KEY = "typeracer-top";
-const MAX_SCORES = 6;
+const MAX_SCORES = 5;
 
 export function getLeaderboard(): Score[] {
   const saved = localStorage.getItem(STORAGE_KEY);
