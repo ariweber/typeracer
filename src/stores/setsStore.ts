@@ -20,6 +20,14 @@ class SetsStore {
         if (!set) return;
         set.texts.push(clean);
     }
+    addTexts(setId: string, texts: string[]) {
+        const clean = texts.map(normalizeText).filter(Boolean);
+        if (clean.length === 0) return;
+
+        const set = this.sets.find((item) => item.id === setId);
+        if (!set) return;
+        set.texts.push(...clean);
+    }
     addSet(title: string) {
         const clean = normalizeText(title);
         if (!clean) return null;
@@ -27,6 +35,14 @@ class SetsStore {
         const newSet = createTextSet(clean);
         this.sets.push(newSet);
         return newSet.id;
+    }
+    renameSet(setId: string, title: string) {
+        const clean = normalizeText(title);
+        if (!clean) return;
+
+        const set = this.sets.find((item) => item.id === setId);
+        if (!set) return;
+        set.title = clean;
     }
 
     removeText(setId: string, textIndex: number) {

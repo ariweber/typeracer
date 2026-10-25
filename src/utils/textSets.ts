@@ -22,15 +22,30 @@ export function createTextSet(title: string): TextSet {
 }
 
 export function addTextToSet(sets: TextSet[], setId: string, text: string) {
-  return sets.map((set) => (set.id === setId ? { ...set, texts: [...set.texts, text] } : set));
+  return sets.map((
+    set,
+  ) => (set.id === setId ? { ...set, texts: [...set.texts, text] } : set));
 }
 
-export function removeTextFromSet(sets: TextSet[], setId: string, textIndex: number) {
+export function removeTextFromSet(
+  sets: TextSet[],
+  setId: string,
+  textIndex: number,
+) {
   return sets.map((set) =>
-    set.id === setId ? { ...set, texts: set.texts.filter((_, index) => index !== textIndex) } : set
+    set.id === setId
+      ? { ...set, texts: set.texts.filter((_, index) => index !== textIndex) }
+      : set
   );
 }
 
 export function removeSet(sets: TextSet[], setId: string) {
   return sets.filter((set) => set.id !== setId);
+}
+
+export function splitSentences(text: string) {
+  return text
+    .split(/\n+|(?<=[.!?])\s+/)
+    .map((sentence) => normalizeText(sentence).replace(/\.+$/, ""))
+    .filter(Boolean);
 }
