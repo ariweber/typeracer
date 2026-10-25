@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { observer } from "mobx-react-lite";
 import type { TextSet } from "../types";
 
 type SetPickerProps = {
@@ -26,4 +26,4 @@ function SetPicker({ sets, selectedId, onSelect }: SetPickerProps) {
   );
 }
 
-export default memo(SetPicker);
+export default observer(SetPicker);
