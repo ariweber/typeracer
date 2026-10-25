@@ -21,7 +21,7 @@ function AddTextForm({ onAdd, placeholder, buttonLabel }: AddTextFormProps) {
       <input
         className="add-text-field"
         type="text"
-        dir="auto"
+        dir="rtl"
         placeholder={placeholder}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}

@@ -11,7 +11,7 @@ export default function TypingInput({ value, onChange, hasError, disabled }: Typ
       <input
         className={hasError ? "typing-input-field error" : "typing-input-field"}
         type="text"
-        dir="auto"
+        dir="rtl"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}

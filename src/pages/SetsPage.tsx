@@ -65,7 +65,7 @@ function SetsPage() {
                 )}
             <AddTextForm
                 onAdd={addToSelectedSet}
-                placeholder={`משפט חדש ל"${selectedSet.title}"`}
+                placeholder={`משפט חדש לסט "${selectedSet.title}"`}
                 buttonLabel="הוסף משפט"
             />
             <button
