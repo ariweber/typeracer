@@ -1,5 +1,5 @@
 import type { Score } from "../types";
-import { observer } from "mobx-react-lite/src/observer.js";
+import { observer } from "mobx-react-lite";
 
 type LeaderboardProps = {
   scores: Score[];
