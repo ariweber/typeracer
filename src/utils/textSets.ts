@@ -4,9 +4,14 @@ import { defaultSets } from "../data/texts";
 const STORAGE_KEY = "typeracer-sets";
 
 export function getTextSets(): TextSet[] {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return defaultSets;
-  return JSON.parse(saved);
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return defaultSets;
+    const sets = JSON.parse(saved);
+    return Array.isArray(sets) && sets.length > 0 ? sets : defaultSets;
+  } catch {
+    return defaultSets;
+  }
 }
 
 export function saveTextSets(sets: TextSet[]) {

@@ -4,9 +4,14 @@ const STORAGE_KEY = "typeracer-top";
 const MAX_SCORES = 5;
 
 export function getLeaderboard(): Score[] {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (!saved) return [];
-  return JSON.parse(saved);
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return [];
+    const scores = JSON.parse(saved);
+    return Array.isArray(scores) ? scores : [];
+  } catch {
+    return [];
+  }
 }
 
 export function saveScore(score: Score) {
